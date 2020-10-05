@@ -13,7 +13,7 @@ import torch as torch;
 # create a tensor variable, this is a constant parameter, we do not need gradient w.r.t. to it
 minimum_w=torch.tensor(np.array([1.0,3.0]),requires_grad=False)
 
-#define some function using pytorch operations (note torch. instead of np.) 
+# define some function using pytorch operations (note torch. instead of np.) 
 # this function is f(w)=||w-minimum||^2, and so has minimum at minimum_w, i.e. at vector [1.0,3.0]
 # it is a convex function so has one minimum, no other local minima
 def f(w):
