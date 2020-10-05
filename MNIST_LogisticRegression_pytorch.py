@@ -78,6 +78,11 @@ for epoch in range(5):  # loop over the dataset multiple times
     for step, data in enumerate(trainloader, 0):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data
+        
+        # Filtered dataset with class values 4 and 5 for Vid: V00933455
+        train_filter_class= np.where((labels==4) | (labels==5))
+        inputs, labels = inputs[train_filter_class], labels[train_filter_class]
+
         inputs = inputs.view(inputs.shape[0], -1)
         # zero the parameter gradients
         optimizer.zero_grad()
@@ -93,7 +98,7 @@ for epoch in range(5):  # loop over the dataset multiple times
         if not step%10:    # print every 10 mini-batches
             # Average measure of loss
             training_loss = running_loss / 10
-            print('[%d, %5d] training average running loss: %.3f' %(epoch + 1, step + 1, training_loss))
+            print('epoch:%d, iteration:%5d training average running loss: %.3f' %(epoch + 1, step + 1, training_loss))
             running_loss = 0.0
             plt.plot(training_loss,step,'bo')
 
@@ -114,10 +119,15 @@ total = 0
 with torch.no_grad():
     running_loss = 0.0
     for step, data in enumerate(testloader, 0):
-        images, labels = data
-        images = images.view(images.shape[0], -1)
-        outputs = net(images)
-        accu, corr = net.accuracy(images, labels)
+        inputs, labels = data
+
+        # Filtered dataset with class values 4 and 5 for Vid: V00933455
+        train_filter_class= np.where((labels==4) | (labels==5))
+        inputs, labels = inputs[train_filter_class], labels[train_filter_class]
+
+        inputs = inputs.view(inputs.shape[0], -1)
+        outputs = net(inputs)
+        accu, corr = net.accuracy(inputs, labels)
         correct += corr
         total += labels.size(0)
 
@@ -125,8 +135,7 @@ with torch.no_grad():
         running_loss += loss.item()
         if not step % 10:    # print every 10 mini-batches
             training_loss = running_loss / 10
-            print('[%5d] testdata average running loss: %.3f' %
-                  (step + 1, training_loss))
+            print('iteration:%5d testdata average running loss: %.3f' %(step + 1, training_loss))
             running_loss = 0.0
             plt.plot(training_loss, step, 'ro')
 
