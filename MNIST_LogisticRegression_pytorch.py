@@ -5,32 +5,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torchvision.transforms as transforms
 # Plotting libraries
-import visdom
-from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np # using only plotting in imshow method
-
-# Initialize plotting library
-class Visualizations:
-    def __init__(self, env_name=None):
-        if env_name is None:
-            env_name = str(datetime.now().strftime("%d-%m %Hh%M"))
-        self.env_name = env_name
-        self.vis = visdom.Visdom(env=self.env_name)
-        self.loss_win = None
-
-    def plot_loss(self, loss, step):
-        self.loss_win = self.vis.line(
-            [loss],
-            [step],
-            win=self.loss_win,
-            update='append' if self.loss_win else None,
-            opts=dict(
-                xlabel='Step',
-                ylabel='Loss',
-                title='Loss (mean per 10 steps)',
-            )
-        )
 
 # General utlity method
 def imshow(img):
@@ -96,11 +72,10 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 # 4. Train the CNN
-for epoch in range(10):  # loop over the dataset multiple times
+for epoch in range(5):  # loop over the dataset multiple times
     running_loss = 0.0
-    # Initialize the visualization environment
-    # vis = Visualizations()
-    for i, data in enumerate(trainloader, 0):
+
+    for step, data in enumerate(trainloader, 0):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data
         inputs = inputs.view(inputs.shape[0], -1)
@@ -114,14 +89,17 @@ for epoch in range(10):  # loop over the dataset multiple times
         optimizer.step()
 
         # print loss statistics
-        running_loss += loss.item()
-        if not i%10:    # print every 10 mini-batches
+        running_loss += loss.item() 
+        if not step%10:    # print every 10 mini-batches
+            # Average measure of loss
             training_loss = running_loss / 10
-            print('[%d, %5d] training loss: %.3f' %(epoch + 1, i + 1, training_loss))
+            print('[%d, %5d] training average running loss: %.3f' %(epoch + 1, step + 1, training_loss))
             running_loss = 0.0
-            # vis.plot_loss(np.mean(running_loss), i)
-        
+            plt.plot(training_loss,step,'bo')
+
 print('Finished Training')
+plt.show()
+print("Training Plotting Done!")
 
 # 5. save the trained model
 PATH = './mnist_net.pth'
@@ -131,22 +109,29 @@ torch.save(net.state_dict(), PATH)
 # load the trained model from saved path
 net.load_state_dict(torch.load(PATH))
 
-
 correct = 0
 total = 0
 with torch.no_grad():
-    for data in testloader:
-        images, labels = data
-        images = images.view(images.shape[0], -1)
-        outputs = net(images)
-        accu, corr = net.accuracy(images, labels)
-        correct += corr
-        total += labels.size(0)
-        # print loss statistics
-        """ running_loss += loss.item()
-        if not step%10:    # print every 10 mini-batches
-            print('[%d, %5d] testdata loss: %.3f' %(epoch + 1, step + 1, running_loss / 10))
-            running_loss = 0.0
-            vis.plot_loss(np.mean(running_loss), step) """
+    for epoch in range(5):  # loop over the dataset multiple times
+        running_loss = 0.0
+        for step, data in enumerate(testloader, 0):
+            images, labels = data
+            images = images.view(images.shape[0], -1)
+            outputs = net(images)
+            accu, corr = net.accuracy(images, labels)
+            correct += corr
+            total += labels.size(0)
+            
+            # print loss statistics
+            running_loss += loss.item()
+            if not step%10:    # print every 10 mini-batches
+                training_loss = running_loss / 10
+                print('[%d, %5d] testdata average running loss: %.3f' %(epoch + 1, step + 1, training_loss))
+                running_loss = 0.0
+                plt.plot(training_loss,step,'ro')
 
 print('Total Accuracy of the network on the total test dataset images: %s correctly identified images: %s is : %d%%'% (total, correct, accu))
+ # red training samples
+# plt.plot(w_good_plot_array,resultPlotFunctionArray,'bo') # blue color functionplot
+plt.show()
+print("Plotting Done!")
