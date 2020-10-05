@@ -112,26 +112,24 @@ net.load_state_dict(torch.load(PATH))
 correct = 0
 total = 0
 with torch.no_grad():
-    for epoch in range(5):  # loop over the dataset multiple times
-        running_loss = 0.0
-        for step, data in enumerate(testloader, 0):
-            images, labels = data
-            images = images.view(images.shape[0], -1)
-            outputs = net(images)
-            accu, corr = net.accuracy(images, labels)
-            correct += corr
-            total += labels.size(0)
-            
-            # print loss statistics
-            running_loss += loss.item()
-            if not step%10:    # print every 10 mini-batches
-                training_loss = running_loss / 10
-                print('[%d, %5d] testdata average running loss: %.3f' %(epoch + 1, step + 1, training_loss))
-                running_loss = 0.0
-                plt.plot(training_loss,step,'ro')
+    running_loss = 0.0
+    for step, data in enumerate(testloader, 0):
+        images, labels = data
+        images = images.view(images.shape[0], -1)
+        outputs = net(images)
+        accu, corr = net.accuracy(images, labels)
+        correct += corr
+        total += labels.size(0)
+
+        # print loss statistics
+        running_loss += loss.item()
+        if not step % 10:    # print every 10 mini-batches
+            training_loss = running_loss / 10
+            print('[%5d] testdata average running loss: %.3f' %
+                  (step + 1, training_loss))
+            running_loss = 0.0
+            plt.plot(training_loss, step, 'ro')
 
 print('Total Accuracy of the network on the total test dataset images: %s correctly identified images: %s is : %d%%'% (total, correct, accu))
- # red training samples
-# plt.plot(w_good_plot_array,resultPlotFunctionArray,'bo') # blue color functionplot
 plt.show()
 print("Plotting Done!")
