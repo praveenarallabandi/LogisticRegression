@@ -43,7 +43,8 @@ class LogisticRegression(nn.Module):
         return x
 
     def predict(self, x):
-        # a function to predict the labels of a batch of inputs
+        # a function to predict the labels of a batch of inputs 
+        # https://pytorch.org/docs/stable/generated/torch.nn.Softmax.html
         x = F.softmax(self.forward(x), dim=1)
         return x
 
@@ -72,15 +73,15 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 # 4. Train the CNN
-for epoch in range(5):  # loop over the dataset multiple times
+for epoch in range(10):  # loop over the dataset multiple times
     running_loss = 0.0
 
     for step, data in enumerate(trainloader, 0):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data
         
-        # Filtered dataset with class values 4 and 5 for Vid: V00933455
-        train_filter_class= np.where((labels==4) | (labels==5))
+        # Filtered dataset with class values 3 and 5 for Vid: V00933455
+        train_filter_class= np.where((labels==3) | (labels==5))
         inputs, labels = inputs[train_filter_class], labels[train_filter_class]
 
         inputs = inputs.view(inputs.shape[0], -1)
@@ -94,7 +95,8 @@ for epoch in range(5):  # loop over the dataset multiple times
         optimizer.step()
 
         # print loss statistics
-        running_loss += loss.item() 
+        running_loss += loss.item()
+
         if not step%10:    # print every 10 mini-batches
             # Average measure of loss
             training_loss = running_loss / 10
@@ -122,7 +124,7 @@ with torch.no_grad():
         inputs, labels = data
 
         # Filtered dataset with class values 4 and 5 for Vid: V00933455
-        train_filter_class= np.where((labels==4) | (labels==5))
+        train_filter_class= np.where((labels==3) | (labels==5))
         inputs, labels = inputs[train_filter_class], labels[train_filter_class]
 
         inputs = inputs.view(inputs.shape[0], -1)
@@ -139,6 +141,6 @@ with torch.no_grad():
             running_loss = 0.0
             plt.plot(training_loss, step, 'ro')
 
-print('Total Accuracy of the network on the total test dataset images: %s correctly identified images: %s is : %d%%'% (total, correct, accu))
+print('Total testset images: %s correctly identified images: %s Error: %s%% Accuracy : %d%%'% (total, correct, ((100/total) * (total - correct)), accu))
 plt.show()
 print("Plotting Done!")
