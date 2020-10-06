@@ -5,7 +5,7 @@
 #   - backward pass - gradients
 #   - Update weights
 
-import torch
+import torch as torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 X=torch.tensor([-1.67245526,-2.36540279,-2.14724263,1.40539096,1.24297767,-1.71043904,2.31579097,2.40479939,-2.22112823], dtype=torch.float32)

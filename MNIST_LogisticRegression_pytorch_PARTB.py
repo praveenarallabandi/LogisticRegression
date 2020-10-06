@@ -96,13 +96,13 @@ for epoch in range(10):  # loop over the dataset multiple times
 
         # print loss statistics
         running_loss += loss.item()
-
         if not step%10:    # print every 10 mini-batches
             # Average measure of loss
             training_loss = running_loss / 10
             print('epoch:%d, iteration:%5d training average running loss: %.3f' %(epoch + 1, step + 1, training_loss))
             running_loss = 0.0
             plt.plot(training_loss,step,'bo')
+            plt.title('trainingriskvalue vs iterations')
 
 print('Finished Training')
 plt.show()
@@ -118,6 +118,7 @@ net.load_state_dict(torch.load(PATH))
 
 correct = 0
 total = 0
+error_calc = 0
 with torch.no_grad():
     running_loss = 0.0
     for step, data in enumerate(testloader, 0):
@@ -140,6 +141,11 @@ with torch.no_grad():
             print('iteration:%5d testdata average running loss: %.3f' %(step + 1, training_loss))
             running_loss = 0.0
             plt.plot(training_loss, step, 'ro')
+            plt.title('testsetriskvalue vs iterations')
+            error_calc = ((100/total) * (total - correct))
+            # Need to enchance this TODO
+            plt.plot(error_calc, step, 'bo')
+            plt.title('testseterror vs iterations')
 
 print('Total testset images: %s correctly identified images: %s Error: %s%% Accuracy : %d%%'% (total, correct, ((100/total) * (total - correct)), accu))
 plt.show()
