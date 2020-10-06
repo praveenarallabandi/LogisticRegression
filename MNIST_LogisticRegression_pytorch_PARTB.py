@@ -14,7 +14,7 @@ def imshow(img):
     npimg = img.numpy()
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
-
+    
 # 1.Loading and Normalizing MNIST dataset
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -143,7 +143,7 @@ with torch.no_grad():
             plt.plot(training_loss, step, 'ro')
             plt.title('testsetriskvalue vs iterations')
             error_calc = ((100/total) * (total - correct))
-            # Need to enchance this TODO
+            # Need to change this TODO
             plt.plot(error_calc, step, 'bo')
             plt.title('testseterror vs iterations')
 
